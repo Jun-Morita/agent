@@ -93,6 +93,36 @@ def get_books_by_keyword(arguments):
     )
     return res
 
+# Wikipedia情報を取得する関数を定義
+def get_wikipedia_info(keyword):
+    url = f"https://ja.wikipedia.org/w/api.php"
+    parameters = {
+        "action": "query",
+        "format": "json",
+        "prop": "extracts",
+        "exintro": True,
+        "explaintext": True,
+        "titles": keyword
+    }
+    response = requests.get(url, params=parameters)
+
+    if response.status_code == 200:
+        data = response.json()
+        pages = data["query"]["pages"]
+        page_id = next(iter(pages))
+        if page_id != "-1":
+            return pages[page_id]["extract"]
+        else:
+            return "Wikipedia page not found for the keyword."
+    else:
+        return f"Error: {response.status_code}"
+
+def get_wikipedia_by_keyword(arguments):
+    res = get_wikipedia_info(
+        keyword=arguments.get('keyword')
+    )
+    return res
+
 # 使用するツールのリスト
 tools = [
     {
@@ -158,6 +188,23 @@ tools = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_wikipedia_by_keyword",
+            "description": "キーワードで日本語Wikipediaから情報を取得します",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "keyword": {
+                        "type": "string",
+                        "description": "Wikipediaで情報を取得するための検索キーワード",
+                    },
+                },
+                "required": ["keyword"],
+            },
+        },
+    },
 ]
 
 def llm_agent(user_input, chat_history):
@@ -194,6 +241,8 @@ def llm_agent(user_input, chat_history):
                 function_response = get_weather_by_location(arguments)
             elif function_name == 'get_books_by_keyword':
                 function_response = get_books_by_keyword(arguments)
+            elif function_name == 'get_wikipedia_by_keyword':
+                function_response = get_wikipedia_by_keyword(arguments)
             else:
                 raise NotImplementedError(f"Unknown function: {function_name}")
 
