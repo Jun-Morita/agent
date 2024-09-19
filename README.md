@@ -12,8 +12,15 @@ This repository contains sample code demonstrating a generative AI agent that in
 
 > pip install notebook ipython  
 > pip install python-dotenv pandas_datareader openai  
+> pip install streamlit  
 
 ## API Key
 Create a .env file and add the following code:
 > OPENAI_API_KEY=xxxxxxxx    
 
+**Run Chat Bot**
+
+To run the chat bot:
+
+> conda activate agent    
+> streamlit run agent.py  
