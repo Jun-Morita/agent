@@ -1,10 +1,11 @@
 # Sample Code for a Generative AI Agent
-This repository contains sample code demonstrating a generative AI agent that integrates various functionalities such as stock price retrieval, weather forecasting, Wikipedia search, and natural language chat. Each function showcases how to interact with external APIs and process responses in a structured manner using Python.
+This repository contains sample code demonstrating a generative AI agent that integrates various functionalities such as stock price retrieval, weather forecasting, book information retrieval, and natural language chat. Each function showcases how to interact with external APIs (e.g., Stooq for stock prices, OpenWeather for weather data, and CiNii Books for book information) and process responses in a structured manner using Python and Streamlit for the interface.
 
 ## Features:
-- Stock Price Retrieval: Fetches real-time stock prices.
-- Weather Forecast: Retrieves current weather data for any location using OpenWeather API.
-- Chat Functionality: A simple natural language interaction for general chat responses.
+- **Stock Price Retrieval:** Fetches real-time stock prices for a specified company between two dates using the Stooq data source.
+- **Weather Forecast:** Retrieves current weather data for any location using the OpenWeather API by providing latitude and longitude.
+- **Book Information Retrieval:** Allows users to search for books by keywords and retrieve related book information, such as title, author, and a link to the book's details, using the CiNii Books OpenSearch API.
+- **Chat Functionality:** A simple natural language interaction for general chat responses, including integration with various tools like stock prices, weather information, and book searches.
 
 ## Environment Setup
 > conda create -n agent python=3.11  

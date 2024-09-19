@@ -1,8 +1,7 @@
-import os
 import json
 import requests
-from dotenv import load_dotenv
 import pandas_datareader.data as web 
+import xml.etree.ElementTree as ET
 import openai
 from openai import OpenAI
 import streamlit as st
@@ -49,6 +48,48 @@ def get_weather_by_location(arguments):
     res = get_info(
         latitude=arguments.get('latitude'),
         longitude=arguments.get('longitude')
+    )
+    return res
+
+# 書籍情報を取得する関数を定義
+def get_books(keyword):
+    url = "https://ci.nii.ac.jp/books/opensearch/search"
+    parameters = {
+        "q": keyword
+    }
+    response = requests.get(url, params=parameters)
+
+    if response.status_code == 200:
+        try:
+            # Parse the XML response
+            root = ET.fromstring(response.content)
+            
+            # Extract book titles and other relevant information
+            books = []
+            for entry in root.findall('{http://www.w3.org/2005/Atom}entry'):
+                title = entry.find('{http://www.w3.org/2005/Atom}title').text
+                link = entry.find('{http://www.w3.org/2005/Atom}link').attrib['href']
+                author = entry.find('{http://purl.org/dc/elements/1.1/}publisher').text if entry.find('{http://purl.org/dc/elements/1.1/}publisher') is not None else 'Unknown'
+                
+                books.append({
+                    "title": title,
+                    "link": link,
+                    "author": author
+                })
+            
+            return json.dumps(books, ensure_ascii=False)  # Ensure correct encoding for Japanese characters
+        except ET.ParseError as e:
+            st.error("Failed to parse XML. Error:")
+            st.write(str(e))
+            return None
+    else:
+        st.error(f"Error: {response.status_code}")
+        st.write(response.text)
+        return None
+
+def get_books_by_keyword(arguments):
+    res = get_books(
+        keyword=arguments.get('keyword')
     )
     return res
 
@@ -99,7 +140,24 @@ tools = [
                 "required": ["latitude", "longitude"],
             },
         },
-    }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_books_by_keyword",
+            "description": "キーワードで書籍情報を検索し、関連する書籍情報を取得します",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "keyword": {
+                        "type": "string",
+                        "description": "書籍情報を取得するための検索キーワード",
+                    },
+                },
+                "required": ["keyword"],
+            },
+        },
+    },
 ]
 
 def llm_agent(user_input, chat_history):
@@ -134,6 +192,8 @@ def llm_agent(user_input, chat_history):
                 function_response = get_stock_price_range(arguments)
             elif function_name == 'get_weather_by_location':
                 function_response = get_weather_by_location(arguments)
+            elif function_name == 'get_books_by_keyword':
+                function_response = get_books_by_keyword(arguments)
             else:
                 raise NotImplementedError(f"Unknown function: {function_name}")
 
@@ -153,13 +213,13 @@ def llm_agent(user_input, chat_history):
         chat_history.append(f"# Bot:\n {response.choices[0].message.content}")
 
 # Build Streamlit UI
-st.title("Simple Chat Bot")
+st.title("Agent AI")
 
 # Maintain chat history in session state
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# Get user input
+# Get user input (Move this part before the chat history display)
 user_input = st.text_input("Input:", key="input_text")
 
 # Add Send button and reset input
@@ -167,8 +227,8 @@ if st.button("Send"):
     if user_input:
         # Run the agent and update chat history
         llm_agent(user_input, st.session_state.chat_history)
-      
-# Display chat history
+
+# Display chat history after the input
 st.write("Chat History:")
 for message in st.session_state.chat_history:
     st.write(message)
