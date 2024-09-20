@@ -7,6 +7,7 @@ This repository contains sample code demonstrating a generative AI agent that in
 - **Book Information Retrieval:** Allows users to search for books by keywords and retrieve related book information, such as title, author, and a link to the book's details, using the CiNii Books OpenSearch API.
 - **Wikipedia Information Retrieval:** Fetches introductory information from Japanese Wikipedia based on a given keyword using the MediaWiki API.
 - **Chat Functionality:** A simple natural language interaction for general chat responses, including integration with various tools like stock prices, weather information, and book searches.
+- **ReAct-based Question Answering** (`react.ipynb`): Demonstrates how to use the ReAct (Reasoning + Acting) framework to answer user questions by combining tools like stock price retrieval, calculation, and general knowledge. This notebook shows how ReAct integrates reasoning through intermediate steps and tool usage to provide structured, accurate answers.
 
 ## Environment Setup
 > conda create -n agent python=3.11  
@@ -16,13 +17,21 @@ This repository contains sample code demonstrating a generative AI agent that in
 > pip install python-dotenv pandas_datareader openai  
 > pip install streamlit  
 
+> pip install langchain langchain_community yfinance gtts langchain-openai duckduckgo-search  
+
 ## API Key
 Create a .env file and add the following code:
 > OPENAI_API_KEY=xxxxxxxx    
 
-**Run Chat Bot**
+**Running the Agent**
 
-To run the chat bot:
+To run the agent as a Streamlit app:
 
 > conda activate agent    
 > streamlit run agent.py  
+
+**Running ReAct Notebook**
+
+To run the ReAct example in react.ipynb, open the notebook in Jupyter or any notebook interface:
+
+> jupyter notebook react.ipynb  
