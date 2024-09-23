@@ -225,7 +225,7 @@ def llm_agent(user_input, chat_history):
     )
 
     # Add user input to chat history
-    st.session_state.chat_history.append(f"# You: \n{user_input}")
+    st.session_state.chat_history.append(f"## You: \n{user_input}")
     
     # ツール呼び出しの結果があるか確認
     tool_calls = getattr(response.choices[0].message, 'tool_calls', None)
@@ -256,10 +256,10 @@ def llm_agent(user_input, chat_history):
                 ]
             )
             # ツール応答をchat_historyに追加
-            chat_history.append(f"# Bot: \n{second_response.choices[0].message.content}")
+            chat_history.append(f"## Agent AI: \n{second_response.choices[0].message.content}")
     else:
         # 通常の応答をchat_historyに追加
-        chat_history.append(f"# Bot:\n {response.choices[0].message.content}")
+        chat_history.append(f"## Agent AI:\n {response.choices[0].message.content}")
 
 # Build Streamlit UI
 st.title("Agent AI")
@@ -268,16 +268,19 @@ st.title("Agent AI")
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# Get user input (Move this part before the chat history display)
+# Get user input
 user_input = st.text_input("Input:", key="input_text")
 
-# Add Send button and reset input
+# Send button and reset input
 if st.button("Send"):
     if user_input:
-        # Run the agent and update chat history
         llm_agent(user_input, st.session_state.chat_history)
 
-# Display chat history after the input
+# Clear Chat History button
+if st.button("Clear Chat History"):
+    st.session_state.chat_history = []
+
+# Display chat history
 st.write("Chat History:")
 for message in st.session_state.chat_history:
     st.write(message)

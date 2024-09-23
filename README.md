@@ -18,6 +18,8 @@ This repository contains sample code demonstrating a generative AI agent that in
 > pip install streamlit  
 
 > pip install langchain langchain_community yfinance gtts langchain-openai duckduckgo-search  
+> pip install google-search-results numexprpyowm langchain-google-genai langgraph  
+  
 
 ## API Key
 Create a .env file and add the following code:
